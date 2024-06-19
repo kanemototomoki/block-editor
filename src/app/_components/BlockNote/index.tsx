@@ -22,6 +22,7 @@ import { Debug } from "./Debug";
 import { Toolbar } from "./Toolbar";
 import { useCallback, useEffect, useState } from "react";
 import { request } from "http";
+import { MdImage } from "react-icons/md";
 
 export const BlockNote = () => {
   const [html, setHtml] = useState<string>();
@@ -86,6 +87,7 @@ export const BlockNote = () => {
       aliases: ["image", "img"],
       group: "メディア",
       subtext: "画像を挿入します。",
+      icon: <MdImage />,
     };
   };
 
