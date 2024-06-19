@@ -16,12 +16,15 @@ import {
   insertOrUpdateBlock,
   locales,
 } from "@blocknote/core";
-import { useState } from "react";
-import { Alert } from "./Alert";
-import { Image } from "./Image";
+import { Alert } from "./customBlocks/Alert";
+import { Image } from "./customBlocks/Image";
 import { Debug } from "./Debug";
+import { Toolbar } from "./Toolbar";
+import { useCallback, useEffect, useState } from "react";
+import { request } from "http";
 
 export const BlockNote = () => {
+  const [html, setHtml] = useState<string>();
   const schema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
@@ -32,6 +35,7 @@ export const BlockNote = () => {
 
   const editor = useCreateBlockNote({
     schema,
+    // メニューを日本語化
     dictionary: locales.ja,
     domAttributes: {
       blockContent: {},
@@ -39,13 +43,37 @@ export const BlockNote = () => {
     initialContent: [
       {
         type: "paragraph",
+        content: [
+          "Hello, ",
+          {
+            type: "text",
+            text: "world!",
+            styles: {
+              bold: true,
+            },
+          },
+        ],
       },
       {
         type: "image",
+        props: {
+          textColor: "default",
+          textAlignment: "left",
+          type: "image",
+          src: "https://cataas.com/cat/81APx1oJqIigJwJM",
+          alt: "alt text",
+          width: "100",
+          height: "100",
+          caption: "caption text",
+          href: "",
+          targetBlank: false,
+        },
+      },
+      {
+        type: "paragraph",
       },
     ],
   });
-  const [blocks, setBlocks] = useState<Block[]>([]);
 
   const insertImage = (editor: typeof schema.BlockNoteEditor) => {
     return {
@@ -61,26 +89,37 @@ export const BlockNote = () => {
     };
   };
 
+  const onChange = useCallback(async () => {
+    const html = await editor.blocksToHTMLLossy(editor.document);
+    setHtml(html);
+  }, [editor]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      onChange();
+    });
+  }, [editor.document, onChange]);
+
   return (
     <>
       <h1>Block Note</h1>
       <BlockNoteView
         editor={editor}
-        onChange={() => {
-          setBlocks(editor.document);
-        }}
         // デフォルトのメニューを無効にする
         slashMenu={false}
+        // デフォルトのフォーマットメニューを無効にする
+        formattingToolbar={false}
         className="w-[75vw]"
+        onChange={onChange}
       >
         <SuggestionMenuController
           triggerCharacter={"/"}
           getItems={async (query) => {
             // video, image, audioを取り除く
-            // const ignoreTypes = ["video", "image", "audio"];
-            const ignoreTypes = ["video", "audio"];
+            const ignoreTypes = ["video", "image", "audio"];
             const items = getDefaultReactSlashMenuItems(editor).filter(
               (item) => {
+                // @ts-ignore
                 return !ignoreTypes.includes(item.key);
               }
             );
@@ -91,13 +130,14 @@ export const BlockNote = () => {
             );
           }}
         />
+        <Toolbar />
+        <hr
+          style={{
+            margin: "1lh 0",
+          }}
+        />
+        <Debug html={html || ""} />
       </BlockNoteView>
-      <hr
-        style={{
-          margin: "1lh 0",
-        }}
-      />
-      <Debug blocks={blocks} />
     </>
   );
 };

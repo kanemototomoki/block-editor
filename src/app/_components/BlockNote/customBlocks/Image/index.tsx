@@ -22,12 +22,30 @@ const schema = {
   src: {
     default: "",
   },
+  alt: {
+    default: "",
+  },
+  width: {
+    default: "",
+  },
+  height: {
+    default: "",
+  },
+  caption: {
+    default: "",
+  },
+  href: {
+    default: "",
+  },
+  targetBlank: {
+    default: false,
+  },
 } satisfies PropSchema;
 
 const config = {
   type: "image",
   propSchema: schema,
-  content: "inline",
+  content: "none",
 } satisfies CustomBlockConfig;
 
 export type CustomBlockImpl = ReactCustomBlockImplementation<
@@ -37,7 +55,6 @@ export type CustomBlockImpl = ReactCustomBlockImplementation<
 >;
 
 const render: CustomBlockImpl["render"] = (props) => {
-  console.log("render, props: ", props);
 
   if (props.block.props.src) {
     return (
@@ -58,28 +75,45 @@ const render: CustomBlockImpl["render"] = (props) => {
         <Button>画像を選択する</Button>
         <Modal {...props} />
       </DialogTrigger>
-      {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
-      <img
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-        }}
-      ></img>
     </>
   );
 };
 
 const parse: CustomBlockImpl["parse"] = (el) => {
-  console.log("parse, el: ", el);
-
-  return undefined;
+  return (
+    <NextImage
+      src={el.getAttribute("src") || ""}
+      alt=""
+      width={100}
+      height={100}
+    />
+  );
 };
 
-const toExternalHTML: CustomBlockImpl["toExternalHTML"] = (props) => {
-  console.log("toExternalHTML, props: ", props);
-  return <p>toExternalHTML</p>;
+const ImageToExternalHTML: CustomBlockImpl["toExternalHTML"] = (props) => {
+  const baseImageDomSpec = (
+    <figure>
+      {/* INFO: 生成されるHTMLのためnext/imageは使用しない */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={props.block.props.src} alt="" width={100} height={100} />
+      {props.block.props.caption && (
+        <figcaption>{props.block.props.caption}</figcaption>
+      )}
+    </figure>
+  );
+
+  if (props.block.props.href) {
+    return (
+      <a
+        href={props.block.props.href}
+        target={props.block.props.targetBlank ? "_blank" : undefined}
+      >
+        {baseImageDomSpec}
+      </a>
+    );
+  }
+
+  return baseImageDomSpec;
 };
 
 /**
@@ -88,6 +122,6 @@ const toExternalHTML: CustomBlockImpl["toExternalHTML"] = (props) => {
  */
 export const Image = createReactBlockSpec(config, {
   render,
-  parse,
-  toExternalHTML,
+  // parse,
+  toExternalHTML: (props) => <ImageToExternalHTML {...props} />,
 });

@@ -1,11 +1,23 @@
-import { Block } from "@blocknote/core";
-import { FC } from "react";
+import {
+  Block,
+  BlockSchema,
+  InlineContentSchema,
+  StyleSchema,
+} from "@blocknote/core";
+import { useBlockNoteEditor } from "@blocknote/react";
+import { FC, } from "react";
 
 type Props = {
-  blocks: Block[];
+  html: string;
 };
 
-export const Debug: FC<Props> = ({ blocks }) => {
+export const Debug: FC<Props> = ({ html }) => {
+  const editor = useBlockNoteEditor<
+    BlockSchema,
+    InlineContentSchema,
+    StyleSchema
+  >();
+
   return (
     <>
       <div
@@ -20,7 +32,9 @@ export const Debug: FC<Props> = ({ blocks }) => {
             border: "1px solid #ccc",
           }}
         >
-          <pre>{/* <code>{editor.blocksToHTMLLossy()}</code> */}</pre>
+          <pre className="whitespace-pre-wrap break-words p-4 bg-gray-100 border border-gray-300 rounded overflow-x-auto">
+            <code>{html}</code>
+          </pre>
         </div>
       </div>
       <div
@@ -36,7 +50,7 @@ export const Debug: FC<Props> = ({ blocks }) => {
           }}
         >
           <pre>
-            <code>{JSON.stringify(blocks, null, 2)}</code>
+            <code>{JSON.stringify(editor.document, null, 2)}</code>
           </pre>
         </div>
       </div>

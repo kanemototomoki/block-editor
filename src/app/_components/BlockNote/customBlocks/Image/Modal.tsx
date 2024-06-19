@@ -16,7 +16,6 @@ export const Modal: FC<Props> = (props) => {
       },
     });
     const json = await res.json();
-    console.log("json: ", json);
     setDisplayCat(json._id);
   };
 
@@ -33,7 +32,7 @@ export const Modal: FC<Props> = (props) => {
       <Dialog>
         {({ close }) => (
           <>
-            <div className="grid ">
+            <div className="grid place-items-center">
               {displayCat ? (
                 <Button
                   onPress={() => {
@@ -59,13 +58,13 @@ export const Modal: FC<Props> = (props) => {
                 <p>Loading...</p>
               )}
               <Button
-                className="bg-white mt-2"
+                className="bg-white mt-2 p-2"
                 onPress={() => {
                   setDisplayCat("");
                   fetchCat();
                 }}
               >
-                reroll
+                refetch random cat
               </Button>
             </div>
           </>
