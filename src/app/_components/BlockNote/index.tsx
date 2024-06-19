@@ -140,6 +140,7 @@ export const BlockNote = () => {
         />
         <Debug html={html || ""} />
       </BlockNoteView>
+     
     </>
   );
 };
