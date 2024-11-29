@@ -9,7 +9,6 @@ import {
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
-  Block,
   BlockNoteSchema,
   defaultBlockSpecs,
   filterSuggestionItems,
@@ -21,7 +20,6 @@ import { Image } from "./customBlocks/Image";
 import { Debug } from "./Debug";
 import { Toolbar } from "./Toolbar";
 import { useCallback, useEffect, useState } from "react";
-import { request } from "http";
 import { MdImage } from "react-icons/md";
 
 export const BlockNote = () => {
@@ -104,14 +102,13 @@ export const BlockNote = () => {
 
   return (
     <>
-      <h1>Block Note</h1>
       <BlockNoteView
         editor={editor}
         // デフォルトのメニューを無効にする
         slashMenu={false}
         // デフォルトのフォーマットメニューを無効にする
         formattingToolbar={false}
-        className="w-[75vw]"
+        className="w-[75vw] mt-4"
         onChange={onChange}
       >
         <SuggestionMenuController
@@ -140,7 +137,6 @@ export const BlockNote = () => {
         />
         <Debug html={html || ""} />
       </BlockNoteView>
-     
     </>
   );
 };

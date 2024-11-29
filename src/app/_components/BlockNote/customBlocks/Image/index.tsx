@@ -55,7 +55,6 @@ export type CustomBlockImpl = ReactCustomBlockImplementation<
 >;
 
 const render: CustomBlockImpl["render"] = (props) => {
-
   if (props.block.props.src) {
     return (
       <>
